@@ -1,4 +1,4 @@
-const { db, admin } = require("./firebase.js");
+const { db } = require("./firebase.js");
 
 require("dotenv").config();
 
@@ -10,13 +10,13 @@ require("dotenv").config();
 //   "http://localhost:5000/musicmakesyourunfaster/europe-west2/app/api/spotify/user-auth";
 // let redirect_uri = "https://musicmakesyourunfaster.firebaseapp.com/fitbit";
 // let redirect_uri = "http://localhost:3000/continue-setup";
-console.log(process.env.FUNCTIONS_EMULATOR);
 
 //change uri based on environment
 let redirect_uri = process.env.FUNCTIONS_EMULATOR
   ? "http://localhost:3000/continue-setup"
   : "https://musicmakesyourunfaster.firebaseapp.com/continue-setup";
 let SpotifyWebApi = require("spotify-web-api-node");
+// const { default: axios } = require("axios");
 
 let spotifyApi = new SpotifyWebApi({
   clientId: process.env.SPOTIFY_CLIENT_ID,
@@ -98,17 +98,38 @@ const spotifyGetRecentTracks = async (accessToken) => {
       uri: item.track.uri,
     })
   );
-
+  console.log(songs[0]);
   let query = [];
-  songs.forEach((song) => query.push(song.id));
-  let audioFeatures = await spotifyApi.getAudioFeaturesForTracks(query);
+  let artists_query = [];
+  //let song_lookup = [];
 
+  songs.forEach((song) => {
+    query.push(song.id);
+    // song_lookup.push({
+    //   id: song.id,
+    //   artist: song.artists[0].name,
+    //   name: song.name,
+    // });
+    artists_query.push(song.artists[0].id);
+  });
+
+  let artists = await spotifyApi.getArtists(artists_query);
+  console.log(artists.body.artists);
+  let audioFeatures = await spotifyApi.getAudioFeaturesForTracks(query);
+  // let genres = await getGenres(song_lookup);
   //merge the audio features into each song object
   songs = songs.map((song) => {
-    let id = audioFeatures.body.audio_features.filter((s) => s.id == song.id);
-    return { ...song, audio_features: id };
+    let id = audioFeatures.body.audio_features.filter((s) => s.id === song.id);
+    let artist_id_match = artists.body.artists.filter(
+      (a) => a.id === song.artists[0].id
+    );
+    return {
+      ...song,
+      audio_features: [id[0]],
+      artist_data: [artist_id_match[0]],
+    };
   });
-  console.log(songs[0]);
+  console.log(songs[10]);
   return { tracks: [...songs], access_token: spotifyApi.getAccessToken() };
 
   // songs.map((song)=>{
@@ -116,6 +137,32 @@ const spotifyGetRecentTracks = async (accessToken) => {
   // })
   // getSongInfo(songs[0]["id"]);
 };
+
+//was going to use last FM to lookup song genres via tags... however this returns blank for most songs
+
+// const getGenres = async (songdata) => {
+//   let song_genre_lookup = {};
+//   song_genre_lookup = await Promise.all(
+//     await songdata.map(async (song) => {
+//       try {
+//         let url = `https://ws.audioscrobbler.com/2.0/?method=track.getTags&api_key=0668944de0e5eb9adadd817bddb5705e&artist=${song.artist
+//           .split(" ")
+//           .join("+")}&track=${song.name
+//           .split(" ")
+//           .join("+")}&user=RJ&format=json`;
+//         console.log(url);
+//         const res = await axios({
+//           url: url,
+//           method: "GET",
+//         });
+//         return res.data;
+//       } catch (err) {
+//         return null;
+//       }
+//     })
+//   );
+//   console.log(song_genre_lookup);
+// };
 
 //returns WAYYYYY TO MUCH DATA, A BIT OVER COMPLEX FOR WHAT WE NEED
 //   spotifyApi.getAudioAnalysisForTrack(song_id).then(
