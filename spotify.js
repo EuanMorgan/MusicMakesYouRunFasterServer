@@ -126,7 +126,12 @@ const spotifyGetRecentTracks = async (accessToken) => {
     return {
       ...song,
       audio_features: [id[0]],
-      artist_data: [artist_id_match[0]],
+      artist_data: {
+        id: artist_id_match[0].id,
+        name: artist_id_match[0].name,
+        genres: artist_id_match[0].genres,
+        image: artist_id_match[0].images[0],
+      },
     };
   });
   console.log(songs[10]);
