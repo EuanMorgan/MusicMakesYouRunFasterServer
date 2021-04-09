@@ -11,6 +11,7 @@ const {
   fitbitGetAccessToken,
   fitbitGetMap,
   fitbitRefreshAccessToken,
+  fitbitRevokeAccess,
 } = require("./fitbit.js");
 var cors = require("cors");
 const app = express();
@@ -59,6 +60,20 @@ app.post("/api/fitbit/map", async (req, res) => {
   let map = await fitbitGetMap(response["access_token"], response["user_id"]);
   console.log("sending map");
   res.send({ run_map: map });
+});
+
+app.post("/api/fitbit/revoke", async (req, res) => {
+  console.log(req.body);
+  let access_token = await fitbitRefreshAccessToken(req.body.refresh_token);
+  if (!access_token["access_token"]) {
+    console.log("sending error...");
+    res.send("error");
+  }
+  let response = await fitbitRevokeAccess(
+    access_token["access_token"],
+    req.body.refresh_token
+  );
+  return 100;
 });
 
 app.post("/api/spotify/refresh", async (req, res) => {

@@ -10,7 +10,7 @@ let redirect_uri = process.env.FUNCTIONS_EMULATOR
   ? "http://localhost:3000/fitbit"
   : "https://musicmakesyourunfaster.firebaseapp.com/fitbit";
 // let redirect_uri = "http://localhost:3000/fitbit";
-
+let data_limit = 100;
 const fitbitGetAccessToken = async (code) => {
   //step two: exchange code for access token
   try {
@@ -69,6 +69,24 @@ const fitbitGetAccessToken = async (code) => {
   //TODO: Step 3 grab refresh token and stuff
 };
 
+const fitbitRevokeAccess = async (access_token, refresh_token) => {
+  try {
+    let res = await axios({
+      method: "POST",
+      url: "https://api.fitbit.com/oauth2/revoke",
+      headers: {
+        Authorization: `Basic ${process.env.FITBIT_BASIC}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      params: {
+        token: access_token,
+      },
+    });
+
+    console.log(res);
+  } catch (error) {}
+};
+
 const fitbitRefreshAccessToken = async (refresh_token) => {
   try {
     console.log("Trying to refresh access token...", refresh_token);
@@ -117,7 +135,7 @@ const fitbitGetMap = async (access_token, user_id) => {
         "user-id": "-",
         beforeDate: tomorrow.toISOString().split("T")[0],
         sort: "desc",
-        limit: 5,
+        limit: data_limit,
         offset: 0,
       },
     }).catch((err) => {
@@ -154,7 +172,7 @@ const getParsedMap = async (activity_list, access_token) => {
   //now have array of trackpoints containing location, heartrate, speed, etc one per second... :D
   //NOTE: I had to modify the source code of the module to accept string input of tcx instead of just files.
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < data_limit; i++) {
     console.log("Loop: " + i);
     console.log(access_token);
     if (activity_list["data"]["activities"][i]["source"]) {
@@ -179,6 +197,7 @@ const getParsedMap = async (activity_list, access_token) => {
           parser = new tcx.Parser(map["data"]);
           // console.log(parser.activity);
           if (parser.activity.sport == "Running") {
+            console.log(map["data"]);
             console.log("breaking arent i to bne fair");
             break; //we have found the most recent map
           } else {
@@ -207,4 +226,5 @@ module.exports = {
   fitbitGetAccessToken,
   fitbitGetMap,
   fitbitRefreshAccessToken,
+  fitbitRevokeAccess,
 };

@@ -1,22 +1,13 @@
 const { db } = require("./firebase.js");
+const moment = require("moment-timezone");
 
 require("dotenv").config();
-
-//BEFORE DEPLOYING: UNCOMMENT THIS!
-// let redirect_uri =
-//   "https://europe-west2-musicmakesyourunfaster.cloudfunctions.net/app/api/spotify/user-auth";
-
-// let redirect_uri =
-//   "http://localhost:5000/musicmakesyourunfaster/europe-west2/app/api/spotify/user-auth";
-// let redirect_uri = "https://musicmakesyourunfaster.firebaseapp.com/fitbit";
-// let redirect_uri = "http://localhost:3000/continue-setup";
 
 //change uri based on environment
 let redirect_uri = process.env.FUNCTIONS_EMULATOR
   ? "http://localhost:3000/continue-setup"
   : "https://musicmakesyourunfaster.firebaseapp.com/continue-setup";
 let SpotifyWebApi = require("spotify-web-api-node");
-// const { default: axios } = require("axios");
 
 let spotifyApi = new SpotifyWebApi({
   clientId: process.env.SPOTIFY_CLIENT_ID,
@@ -90,7 +81,10 @@ const spotifyGetRecentTracks = async (accessToken) => {
       artists: item.track.artists,
       href: item.track.href,
       id: item.track.id,
-      played_at: item.played_at.split(".")[0],
+      played_at: moment(item.played_at)
+        .tz(moment.tz.guess())
+        .format()
+        .slice(0, 19), //DEFAULT IS UTC, NEED TO CONVERT TO BST, ALSO IF SUPPORTING OTHER TIMEZONES IN FUTURE
       duration: item.track.duration_ms,
       rough_started_at:
         new Date(item.played_at).getTime() - item.track.duration_ms,
