@@ -17,6 +17,7 @@ const {
 const { main } = require("./scraper.js");
 
 var cors = require("cors");
+const { deleteAccount } = require("./misc.js");
 const app = express();
 app.use(cors());
 
@@ -97,6 +98,12 @@ app.get("/test-create-account", async (req, res) => {
   let x = await main();
   console.log("Sending the response aren't i ");
   res.send(JSON.stringify({ data: x }));
+});
+
+app.get("/test-delete", async (req, res) => {
+  let x = await deleteAccount();
+  console.log("Sending the response aren't i ");
+  res.send("hello");
 });
 
 const runtimeOpts = {
