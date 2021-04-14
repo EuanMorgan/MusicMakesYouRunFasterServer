@@ -13,9 +13,12 @@ const {
   fitbitRefreshAccessToken,
   fitbitRevokeAccess,
 } = require("./fitbit.js");
+
+const { main } = require("./scraper.js");
+
 var cors = require("cors");
 const app = express();
-app.use(cors({ origin: "*" }));
+app.use(cors());
 
 app.get("/timestamp", (request, response) => {
   response.send(`${Date.now()}`);
@@ -90,4 +93,17 @@ app.get("/hello-world", async (req, res) => {
   res.send("Hello, baby!");
 });
 
-exports.app = functions.region("europe-west2").https.onRequest(app);
+app.get("/test-create-account", async (req, res) => {
+  let x = await main();
+  res.send(JSON.stringify({ data: x }));
+});
+
+const runtimeOpts = {
+  timeoutSeconds: 300,
+  memory: "1GB",
+};
+
+exports.app = functions
+  .runWith(runtimeOpts)
+  .region("europe-west2")
+  .https.onRequest(app);

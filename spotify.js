@@ -82,7 +82,7 @@ const spotifyGetRecentTracks = async (accessToken) => {
       href: item.track.href,
       id: item.track.id,
       played_at: moment(item.played_at)
-        .tz(moment.tz.guess())
+        .utcOffset("+01:00")
         .format()
         .slice(0, 19), //DEFAULT IS UTC, NEED TO CONVERT TO BST, ALSO IF SUPPORTING OTHER TIMEZONES IN FUTURE
       duration: item.track.duration_ms,
