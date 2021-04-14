@@ -95,6 +95,7 @@ app.get("/hello-world", async (req, res) => {
 
 app.get("/test-create-account", async (req, res) => {
   let x = await main();
+  console.log("Sending the response aren't i ");
   res.send(JSON.stringify({ data: x }));
 });
 

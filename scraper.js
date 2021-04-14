@@ -63,7 +63,7 @@ const main = async () => {
     browser,
     page
   );
-  let d = await db.collection("users").doc("9BSVPX").get();
+  let d = await db.collection("users").doc("99GN7F").get();
   return d.data();
 };
 
