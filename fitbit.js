@@ -136,7 +136,7 @@ const fitbitGetMap = async (access_token, user_id) => {
         beforeDate: tomorrow.toISOString().split("T")[0],
         sort: "desc",
         limit: data_limit,
-        offset: 0,
+        offset: 1,
       },
     }).catch((err) => {
       //console.log(`Error grabbing activity list${err}`);

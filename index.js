@@ -5,6 +5,7 @@ const {
   spotifyGetAccessToken,
   spotifyGetRecentTracks,
   spotifyRefreshAccessToken,
+  similarSongs,
 } = require("./spotify.js");
 
 const {
@@ -18,6 +19,7 @@ const { main } = require("./scraper.js");
 
 var cors = require("cors");
 const { deleteAccount } = require("./misc.js");
+const { json } = require("./tcx.js");
 const app = express();
 app.use(cors());
 
@@ -104,6 +106,20 @@ app.get("/test-delete", async (req, res) => {
   let x = await deleteAccount();
   //console.log("Sending the response aren't i ");
   res.send("hello");
+});
+
+app.post("/api/spotify/similar", async (req, res) => {
+  // console.log(req.body.data);
+  // console.log(req.body);
+  let response = await spotifyRefreshAccessToken(req.body.refreshToken);
+  if (!response["access_token"]) {
+    res.send("error");
+  }
+  let returnVal = await similarSongs(response["access_token"], req.body);
+
+  res.send(
+    JSON.stringify({ data: returnVal, token: response["access_token"] })
+  );
 });
 
 const runtimeOpts = {

@@ -137,6 +137,89 @@ const spotifyGetRecentTracks = async (accessToken) => {
   // getSongInfo(songs[0]["id"]);
 };
 
+const similarSongs = async (token, data) => {
+  // console.log(token);
+  console.log([...data.seed_songs]);
+  let spotifyApi = new SpotifyWebApi({
+    accessToken: token,
+    clientId: process.env.SPOTIFY_CLIENT_ID,
+    clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+    redirectUri: redirect_uri,
+  });
+
+  let random = data.seed_songs.sort(() => 0.5 - Math.random()).slice(0, 5);
+  let range = 0.4;
+  let options = {
+    max_acousticness: data.data[0] + range,
+    max_danceability: data.data[1] + range,
+    max_energy: data.data[2] + range,
+    max_valence: data.data[3] + range,
+    max_speechiness: data.data[4] + range,
+
+    min_acousticness: data.data[0] - range,
+    min_danceability: data.data[1] - range,
+    min_energy: data.data[2] - range,
+    min_valence: data.data[3] - range,
+    min_speechiness: data.data[4] - range,
+
+    seed_tracks: random,
+  };
+
+  let options2 = {
+    min_energy: 0.4,
+    seed_artists: ["6mfK6Q2tzLMEchAr0e9Uzu", "4DYFVNKZ1uixa6SQTvzQwJ"],
+    min_popularity: 50,
+  };
+
+  // console.log(options, options2);
+
+  let songs = await spotifyApi.getRecommendations(options);
+  // console.log(songs.body);
+
+  console.log("creating");
+  let date = new Date().toISOString().split("T")[0];
+
+  let x = await db.collection("users").doc(data.id).get();
+  let last = x.data().spotify;
+  if (last.last_created_playlist === date) {
+    return last.last_playlist_id;
+  }
+
+  let playlist = await spotifyApi
+    .createPlaylist(`Recommended Running Songs ${date}`, {
+      description:
+        "Auto-created by Music Makes You Run Faster... Sorry if this is annoying 😂",
+      public: false,
+    })
+    .catch((err) => console.log(err));
+
+  await db
+    .collection("users")
+    .doc(data.id)
+    .set(
+      {
+        spotify: {
+          last_created_playlist: date,
+          last_playlist_id: playlist.body.uri,
+        },
+      },
+      { merge: true }
+    );
+
+  console.log("adding");
+
+  // console.log(playlist.body.id, songs.body.tracks);
+
+  await spotifyApi
+    .addTracksToPlaylist(
+      playlist.body.id,
+      songs.body.tracks.map((song) => song.uri)
+    )
+    .catch((err) => console.log(err));
+
+  return playlist.body.uri;
+};
+
 //was going to use last FM to lookup song genres via tags... however this returns blank for most songs
 
 // const getGenres = async (songdata) => {
@@ -197,4 +280,5 @@ module.exports = {
   spotifyGetAccessToken,
   spotifyGetRecentTracks,
   spotifyRefreshAccessToken,
+  similarSongs,
 };
