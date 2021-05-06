@@ -182,7 +182,7 @@ const similarSongs = async (token, data) => {
   let x = await db.collection("users").doc(data.id).get();
   let last = x.data().spotify;
   if (last.last_created_playlist === date) {
-    return last.last_playlist_id;
+    return [last.last_playlist_id, true];
   }
 
   let playlist = await spotifyApi
@@ -217,7 +217,7 @@ const similarSongs = async (token, data) => {
     )
     .catch((err) => console.log(err));
 
-  return playlist.body.uri;
+  return [playlist.body.uri, false]; //false = new playlist, used to check whether a new playlist was created or the old one returned
 };
 
 //was going to use last FM to lookup song genres via tags... however this returns blank for most songs
