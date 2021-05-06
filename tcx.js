@@ -11,7 +11,7 @@ class Timestamp {
       this.date = new Date(time_str);
       this.epochMilliseconds = this.date.getTime();
     } catch (e) {
-      //console.log(e);
+      ////console.log(e);
     }
   }
   isValid() {
@@ -46,11 +46,11 @@ class ElapsedTime {
     this.mm = Math.floor(rem / 60.0);
     this.ss = rem - this.mm * 60.0;
     if (this.mm > 59) {
-      //console.log("ElapsedTime mm normalized to 59 - " + this.mm);
+      ////console.log("ElapsedTime mm normalized to 59 - " + this.mm);
       this.mm = 59;
     }
     if (this.ss > 59) {
-      //console.log("ElapsedTime ss normalized to 59 - " + this.ss);
+      ////console.log("ElapsedTime ss normalized to 59 - " + this.ss);
       this.ss = 59;
     }
   }
@@ -121,7 +121,7 @@ class Trackpoint {
       let ts = new Timestamp(this.time);
       this.epoch_ms = ts.epochMilliseconds;
     } catch (e) {
-      //console.log(e);
+      ////console.log(e);
     }
     if (keys.includes("Position")) {
       try {
@@ -129,7 +129,7 @@ class Trackpoint {
         this.latitude = Number(position["LatitudeDegrees"]);
         this.longitude = Number(position["LongitudeDegrees"]);
       } catch (e) {
-        //console.log(e);
+        ////console.log(e);
       }
     }
     if (keys.includes("AltitudeMeters")) {
@@ -143,7 +143,7 @@ class Trackpoint {
         let hr = raw_obj["HeartRateBpm"];
         this.heart_rate_bpm = Number(hr["Value"]);
       } catch (e) {
-        //console.log(e);
+        ////console.log(e);
       }
     }
     if (keys.includes("Cadence")) {
@@ -167,7 +167,7 @@ class Trackpoint {
           }
         }
       } catch (e) {
-        //console.log(e);
+        ////console.log(e);
       }
     }
   }
@@ -189,7 +189,7 @@ class Trackpoint {
         this.altitude_meters = Number(this.altitude_meters);
         this.altitude_feet = this.altitude_meters * Trackpoint.FEET_PER_METER;
       } catch (e) {
-        //console.log(e);
+        ////console.log(e);
       }
     }
   }
@@ -200,7 +200,7 @@ class Trackpoint {
         this.distance_miles = this.distance_km * Trackpoint.MILES_PER_KILOMETER;
         this.distance_yds = this.distance_miles * Trackpoint.YARDS_PER_MILE;
       } catch (e) {
-        //console.log(e);
+        ////console.log(e);
       }
     }
   }
@@ -216,7 +216,7 @@ class Trackpoint {
       let lng = this.longitude;
       this.location = new GeoJsonLocation(lat, lng);
     } catch (e) {
-      //console.log(e);
+      ////console.log(e);
     }
   }
   cleanup() {}
@@ -310,7 +310,7 @@ class Parser {
       let activityDollar = activity["$"];
       this.activity.sport = activityDollar["Sport"];
     } catch (e) {
-      //console.log(e);
+      ////console.log(e);
     }
     try {
       let author_data = tcdb["Author"];

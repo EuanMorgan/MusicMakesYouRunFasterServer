@@ -8,7 +8,7 @@ C = {
   password: process.env.FITBIT_TEST_PASSWORD,
 };
 
-//console.log(C);
+////console.log(C);
 const USERNAME_SELECTOR = "form#loginForm";
 const PASSWORD_SELECTOR = "input#password";
 
@@ -30,7 +30,7 @@ async function createNewUserAndLogin(url, browser, page) {
   await page.goto(url);
   await new Promise((r) => setTimeout(r, 4000));
   for (let i = 0; i < 5; i++) {
-    //console.log("tabbingt");
+    ////console.log("tabbingt");
     await page.keyboard.press("Tab", {
       delay: 100,
     });

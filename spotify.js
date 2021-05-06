@@ -18,10 +18,10 @@ let spotifyApi = new SpotifyWebApi({
 const spotifyGetAccessToken = async (token, userId) => {
   try {
     let data = await spotifyApi.authorizationCodeGrant(token);
-    //console.log(`The token expires in ${data.body.expires_in}`);
-    //console.log(`The token is ${data.body.access_token}`);
-    //console.log(`The refresh token is ${data.body.refresh_token}`);
-    //console.log(`adding to database user ${userId}..."`);
+    ////console.log(`The token expires in ${data.body.expires_in}`);
+    ////console.log(`The token is ${data.body.access_token}`);
+    ////console.log(`The refresh token is ${data.body.refresh_token}`);
+    ////console.log(`adding to database user ${userId}..."`);
     await db
       .collection("users")
       .doc(userId)
@@ -33,16 +33,16 @@ const spotifyGetAccessToken = async (token, userId) => {
         },
         { merge: true }
       );
-    //console.log("added!");
+    ////console.log("added!");
     return { status: 200, message: "success!" };
   } catch (error) {
-    //console.log(error);
+    ////console.log(error);
     return error.body;
   }
 };
 
 const spotifyRefreshAccessToken = async (refreshToken) => {
-  //console.log("Attempting to refresh access token", refreshToken);
+  ////console.log("Attempting to refresh access token", refreshToken);
   let spotifyApi = new SpotifyWebApi({
     refreshToken: refreshToken,
     clientId: process.env.SPOTIFY_CLIENT_ID,
@@ -51,10 +51,10 @@ const spotifyRefreshAccessToken = async (refreshToken) => {
   });
   try {
     let res = await spotifyApi.refreshAccessToken();
-    //console.log(res.body);
+    ////console.log(res.body);
     return res.body;
   } catch (error) {
-    //console.log(error.body);
+    ////console.log(error.body);
     return error.body;
   }
 };
@@ -72,7 +72,7 @@ const spotifyGetRecentTracks = async (accessToken) => {
   });
 
   // Output items
-  //console.log("Your 50 most recently played tracks are:");
+  ////console.log("Your 50 most recently played tracks are:");
   let songs = [];
   //create an array of song objects, extracting only useful data for each
   data.body.items.forEach((item) =>
@@ -92,7 +92,7 @@ const spotifyGetRecentTracks = async (accessToken) => {
       uri: item.track.uri,
     })
   );
-  //console.log(songs[0]);
+  ////console.log(songs[0]);
   let query = [];
   let artists_query = [];
   //let song_lookup = [];
@@ -108,7 +108,7 @@ const spotifyGetRecentTracks = async (accessToken) => {
   });
 
   let artists = await spotifyApi.getArtists(artists_query);
-  //console.log(artists.body.artists);
+  ////console.log(artists.body.artists);
   let audioFeatures = await spotifyApi.getAudioFeaturesForTracks(query);
   // let genres = await getGenres(song_lookup);
   //merge the audio features into each song object
@@ -128,7 +128,7 @@ const spotifyGetRecentTracks = async (accessToken) => {
       },
     };
   });
-  //console.log(songs[10]);
+  ////console.log(songs[10]);
   return { tracks: [...songs], access_token: spotifyApi.getAccessToken() };
 
   // songs.map((song)=>{
@@ -138,8 +138,8 @@ const spotifyGetRecentTracks = async (accessToken) => {
 };
 
 const similarSongs = async (token, data) => {
-  // console.log(token);
-  console.log([...data.seed_songs]);
+  // //console.log(token);
+  //console.log([...data.seed_songs]);
   let spotifyApi = new SpotifyWebApi({
     accessToken: token,
     clientId: process.env.SPOTIFY_CLIENT_ID,
@@ -171,12 +171,12 @@ const similarSongs = async (token, data) => {
     min_popularity: 50,
   };
 
-  // console.log(options, options2);
+  // //console.log(options, options2);
 
   let songs = await spotifyApi.getRecommendations(options);
-  // console.log(songs.body);
+  // //console.log(songs.body);
 
-  console.log("creating");
+  //console.log("creating");
   let date = new Date().toISOString().split("T")[0];
 
   let x = await db.collection("users").doc(data.id).get();
@@ -206,9 +206,9 @@ const similarSongs = async (token, data) => {
       { merge: true }
     );
 
-  console.log("adding");
+  //console.log("adding");
 
-  // console.log(playlist.body.id, songs.body.tracks);
+  // //console.log(playlist.body.id, songs.body.tracks);
 
   await spotifyApi
     .addTracksToPlaylist(
@@ -232,7 +232,7 @@ const similarSongs = async (token, data) => {
 //           .join("+")}&track=${song.name
 //           .split(" ")
 //           .join("+")}&user=RJ&format=json`;
-//         //console.log(url);
+//         ////console.log(url);
 //         const res = await axios({
 //           url: url,
 //           method: "GET",
@@ -243,16 +243,16 @@ const similarSongs = async (token, data) => {
 //       }
 //     })
 //   );
-//   //console.log(song_genre_lookup);
+//   ////console.log(song_genre_lookup);
 // };
 
 //returns WAYYYYY TO MUCH DATA, A BIT OVER COMPLEX FOR WHAT WE NEED
 //   spotifyApi.getAudioAnalysisForTrack(song_id).then(
 //     (data) => {
-//       //console.log(data.body);
+//       ////console.log(data.body);
 //     },
 //     (err) => {
-//       //console.log(err);
+//       ////console.log(err);
 //     }
 //   );
 //Spotify don't provide individual song genres :()
