@@ -188,7 +188,7 @@ const similarSongs = async (token, data) => {
   let playlist = await spotifyApi
     .createPlaylist(`Recommended Running Songs ${date}`, {
       description:
-        "Auto-created by Music Makes You Run Faster... Sorry if this is annoying 😂",
+        "Auto-created by Music Makes You Run Faster. You got this 💪",
       public: false,
     })
     .catch((err) => console.log(err));
