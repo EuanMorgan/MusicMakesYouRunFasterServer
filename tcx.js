@@ -1,3 +1,7 @@
+/*MODIFIED VERSION OF tcx-js
+  https://www.npmjs.com/package/tcx-js
+*/
+
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");

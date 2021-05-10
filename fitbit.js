@@ -2,6 +2,8 @@ require("dotenv").config();
 const axios = require("axios");
 const { db, admin } = require("./firebase.js");
 const tcx = require("./tcx.js");
+
+const fs = require("fs");
 //BEFORE DEPLOY:
 // let redirect_uri =
 //   "https://europe-west2-musicmakesyourunfaster.cloudfunctions.net/app/api/fitbit/user-auth";
@@ -14,7 +16,6 @@ let data_limit = 100;
 const fitbitGetAccessToken = async (code) => {
   //step two: exchange code for access token
   try {
-    ////console.log("Getting token");
     let res = await axios({
       method: "POST",
       url: "https://api.fitbit.com/oauth2/token",
@@ -29,11 +30,9 @@ const fitbitGetAccessToken = async (code) => {
         code: code,
       },
     });
-    // ////console.log(res["data"]);
     let id = res["data"]["user_id"];
-    access_token = res["data"]["access_token"];
-    ////console.log("Got access token: ", access_token);
-    ////console.log("Getting user data");
+    let access_token = res["data"]["access_token"];
+
     let user_data = await axios({
       method: "GET",
       url: `https://api.fitbit.com/1/user/${id}/profile.json`,
@@ -124,8 +123,7 @@ const fitbitRefreshAccessToken = async (refresh_token) => {
 const fitbitGetMap = async (access_token, user_id) => {
   try {
     ////console.log("getting map....");
-    let today = new Date();
-    let tomorrow = new Date(today);
+    let tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     let activity_list = await axios({
       method: "GET",
@@ -148,7 +146,7 @@ const fitbitGetMap = async (access_token, user_id) => {
     //////console.log("got activity list ", activity_list["data"]);
     ////console.log(activity_list);
     let parsed = await getParsedMap(activity_list, access_token);
-    // ////console.log(parsed);
+    console.log(parsed);
     return parsed;
     // let parsed = parseString(map["data"], (err, result) => {
     //   if (result) return result;
@@ -195,7 +193,11 @@ const getParsedMap = async (activity_list, access_token) => {
         }
         try {
           parser = new tcx.Parser(map["data"]);
+
           // ////console.log(parser.activity);
+
+          fs.writeFileSync("sample.tcx", map["data"]);
+
           if (parser.activity.sport == "Running") {
             ////console.log(map["data"]);
             ////console.log("breaking arent i to bne fair");

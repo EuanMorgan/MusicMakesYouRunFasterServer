@@ -20,7 +20,14 @@ const { main } = require("./scraper.js");
 var cors = require("cors");
 const { deleteAccount } = require("./misc.js");
 const { json } = require("./tcx.js");
+
 const app = express();
+
+// let corsOptions = {
+//   origin: "https://musicmakesyourunfaster.firebaseapp.com",
+//   optionsSuccessStatus: 200,
+// };
+
 app.use(cors());
 
 app.get("/timestamp", (request, response) => {
@@ -47,24 +54,17 @@ app.post("/api/spotify/grab-songs", async (req, res) => {
 
 // FITBIT CALLS
 app.post("/api/fitbit/user-auth", async (req, res) => {
-  ////console.log(req.body.code);
-  let r = await fitbitGetAccessToken(req.body.code);
-  ////console.log("Custom Auth code... " + r);
+  let access = await fitbitGetAccessToken(req.body.code);
 
-  res.send(r);
+  res.send(access);
 });
 
 app.post("/api/fitbit/map", async (req, res) => {
-  ////console.log(req.body.refresh_token);
   let response = await fitbitRefreshAccessToken(req.body.refresh_token);
   if (!response["access_token"]) {
-    ////console.log("sending error...");
     res.send("error");
   }
-  ////console.log("Got access token ", response["access_token"]);
-  ////console.log("sending it off to get map....");
   let map = await fitbitGetMap(response["access_token"], response["user_id"]);
-  ////console.log("sending map");
   res.send({ run_map: map });
 });
 
