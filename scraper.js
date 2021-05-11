@@ -67,4 +67,6 @@ const main = async () => {
   return d.data();
 };
 
+// main();
+
 module.exports = { main };

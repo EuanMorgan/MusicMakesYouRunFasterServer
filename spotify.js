@@ -147,7 +147,10 @@ const similarSongs = async (token, data) => {
     redirectUri: redirect_uri,
   });
 
-  let random = data.seed_songs.sort(() => 0.5 - Math.random()).slice(0, 5);
+  let random =
+    data.seed_songs.length > 5
+      ? data.seed_songs.sort(() => 0.5 - Math.random()).slice(0, 5)
+      : data.seed_songs;
   let range = 0.4;
   let options = {
     max_acousticness: data.data[0] + range,

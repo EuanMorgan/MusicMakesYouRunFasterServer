@@ -3,7 +3,6 @@ const axios = require("axios");
 const { db, admin } = require("./firebase.js");
 const tcx = require("./tcx.js");
 
-const fs = require("fs");
 //BEFORE DEPLOY:
 // let redirect_uri =
 //   "https://europe-west2-musicmakesyourunfaster.cloudfunctions.net/app/api/fitbit/user-auth";
@@ -195,8 +194,6 @@ const getParsedMap = async (activity_list, access_token) => {
           parser = new tcx.Parser(map["data"]);
 
           // ////console.log(parser.activity);
-
-          fs.writeFileSync("sample.tcx", map["data"]);
 
           if (parser.activity.sport == "Running") {
             ////console.log(map["data"]);
